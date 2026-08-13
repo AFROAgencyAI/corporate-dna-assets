@@ -4,17 +4,17 @@ Public static assets for Nutrigene Corporate DNA landing pages (GHL paste, etc).
 
 ## 815 Know Your Genes
 
-Base URL (jsDelivr CDN):
+Pages base:
 
 ```
-https://cdn.jsdelivr.net/gh/AFROAgencyAI/corporate-dna-assets@main/815
+https://afroagencyai.github.io/corporate-dna-assets/815
 ```
+
+All page images are **WebP**.
 
 | Path | Use |
 |------|-----|
-| `images/to-wire/*.jpg` | Hero, why, genes, productivity |
-| `images/caffeine-vs-cardiovascular.jpg` | Graph |
-| `poster/*` | Career Talent cover, PLANET mockup |
+| `images/to-wire/*.webp` | Hero, why, genes, productivity |
+| `images/caffeine-vs-cardiovascular.webp` | Graph |
+| `poster/*.webp` | Career Talent cover, PLANET mockup |
 | `quiz/index.html?embed=1` | Stress quiz lightbox iframe |
-
-Photos compressed to progressive JPEG for GHL paste weight.
