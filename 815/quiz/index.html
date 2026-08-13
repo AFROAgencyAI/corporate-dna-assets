@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Stress Response Profile | Nutrigene</title>
+  <style>
+    @font-face { font-family: "Gotham"; src: url("fonts/Gotham-Light.woff2") format("woff2"); font-weight: 300; font-style: normal; font-display: swap; }
+    @font-face { font-family: "Gotham"; src: url("fonts/Gotham-Book.woff2") format("woff2"); font-weight: 400; font-style: normal; font-display: swap; }
+    @font-face { font-family: "Gotham"; src: url("fonts/Gotham-Medium.woff2") format("woff2"); font-weight: 500; font-style: normal; font-display: swap; }
+    @font-face { font-family: "Gotham"; src: url("fonts/Gotham-Bold.woff2") format("woff2"); font-weight: 700; font-style: normal; font-display: swap; }
+    @font-face { font-family: "Gotham"; src: url("fonts/Gotham-Ultra.woff2") format("woff2"); font-weight: 800; font-style: normal; font-display: swap; }
+
+    :root {
+      --red: #EA4335;
+      --red-light: #FEF0EF;
+      --red-border: #F5A8A1;
+      --blue: #4285F4;
+      --blue-light: #EAF1FE;
+      --blue-border: #A4C4F9;
+      --yellow: #FBBC05;
+      --yellow-light: #FFF8E1;
+      --green: #34A853;
+      --green-light: #E8F5E9;
+      --dark: #1A1A1A;
+      --body: #3D3D3D;
+      --muted: #4A4A4A;
+      --border: #E4E4E4;
+      --bg: #F5F5F5;
+      --white: #FFFFFF;
+      --radius: 16px;
+      --radius-sm: 12px;
+      --shadow: 0 2px 6px rgba(0,0,0,.03), 0 8px 24px rgba(0,0,0,.04);
+      --c-over: #4285F4;
+      --c-anx: #E8A317;
+      --c-emo: #EA4335;
+      --c-phys: #34A853;
+      --c-exh: #5F6368;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Gotham", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--body);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+    .wrap { max-width: 560px; margin: 0 auto; padding: 24px 16px 56px; }
+    .brand { display: flex; align-items: center; margin-bottom: 20px; }
+    .brand .logo-ng { height: 34px; width: auto; display: block; }
+
+    .hidden { display: none !important; }
+    .card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 22px 18px;
+      box-shadow: var(--shadow);
+    }
+
+    h1 {
+      font-size: 1.45rem;
+      font-weight: 700;
+      color: var(--dark);
+      letter-spacing: -0.02em;
+      line-height: 1.25;
+      margin: 0 0 6px;
+    }
+    .zh-line { font-size: 0.95rem; color: var(--muted); font-weight: 400; margin: 0 0 14px; }
+    .lede { font-size: 0.95rem; color: var(--body); margin: 0 0 4px; }
+    .lede-zh { font-size: 0.88rem; color: var(--muted); margin: 0 0 20px; }
+
+    .progress { height: 6px; background: var(--border); border-radius: 99px; overflow: hidden; margin-bottom: 14px; }
+    .progress > i { display: block; height: 100%; width: 0; background: var(--blue); border-radius: 99px; transition: width .38s cubic-bezier(.22, .61, .36, 1); }
+    .q-meta {
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--muted);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+    .q-en { font-size: 1.08rem; font-weight: 700; color: var(--dark); line-height: 1.35; margin: 0 0 6px; }
+    .q-zh { font-size: 0.92rem; color: var(--muted); line-height: 1.4; margin: 0 0 10px; }
+    .q-ex { font-size: 0.82rem; color: var(--muted); margin: 0 0 4px; }
+    .q-ex-zh { font-size: 0.8rem; color: var(--muted); margin: 0 0 14px; }
+
+    .opts { display: grid; gap: 8px; }
+    .opt {
+      display: flex; align-items: center; gap: 12px; width: 100%;
+      text-align: left; border: 1.5px solid var(--border); background: #fafafa;
+      border-radius: var(--radius-sm); padding: 12px 14px;
+      font-family: inherit; cursor: pointer; color: var(--dark);
+      transition: border-color .15s, background .15s, box-shadow .15s;
+    }
+    .opt:hover { border-color: var(--blue-border); background: var(--white); }
+    .opt.is-selected { border-color: var(--blue); background: var(--blue-light); box-shadow: 0 0 0 1px var(--blue); }
+    .opt .radio {
+      width: 20px; height: 20px; border-radius: 50%; border: 2px solid #9AA0A6;
+      flex-shrink: 0; display: grid; place-items: center; background: var(--white);
+      transition: border-color .15s;
+    }
+    .opt.is-selected .radio { border-color: var(--blue); }
+
+    /* The dot scales up rather than appearing, on a slight overshoot curve, so
+       the answer registers as an act rather than a state that was already true. */
+    .opt .radio::after {
+      content: ""; width: 10px; height: 10px; border-radius: 50%; background: transparent;
+      transform: scale(0);
+      transition: transform .2s cubic-bezier(.34, 1.56, .64, 1), background .12s;
+    }
+    .opt.is-selected .radio::after { background: var(--blue); transform: scale(1); }
+
+    /* A single dip and return. The chosen row gives under the finger, which is
+       the feedback a click has no other way to report. */
+    .opt.is-picked { animation: optPick .3s ease; }
+
+    @keyframes optPick {
+      0% { transform: scale(1); }
+      32% { transform: scale(.975); }
+      100% { transform: scale(1); }
+    }
+
+    /* Answering dims the rejected options instead of leaving five equal rows,
+       so the picked one is alone on screen before the question changes. */
+    .opts.is-locked .opt:not(.is-selected) { opacity: .38; }
+    .opts.is-locked .opt { cursor: default; }
+
+    /* The question block leaves upward and the next one arrives from below, so
+       the direction of travel says "forward" on its own. Without this the swap
+       was a flash: same position, same size, only the words changed. */
+    .q-body { transition: opacity .17s ease, transform .17s ease; }
+    .q-body.is-out { opacity: 0; transform: translateY(-10px); }
+    .q-body.is-in { animation: qEnter .28s cubic-bezier(.22, .61, .36, 1) backwards; }
+
+    @keyframes qEnter {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: none; }
+    }
+
+    /* Options arrive a beat after the question and 45ms apart, which reads as a
+       new set landing rather than the old set having its labels rewritten.
+       fill is backwards, NOT both: backwards holds the start state through the
+       stagger delay, which is what stops an un-animated flash. Adding forwards
+       would pin opacity at 1 once it ends, and a finished animation still beats
+       a plain rule, so the is-locked dim below would silently never apply. */
+    .q-body.is-in .opt {
+      animation: optEnter .3s cubic-bezier(.22, .61, .36, 1) backwards;
+      animation-delay: calc(var(--i, 0) * 45ms + 70ms);
+    }
+
+    @keyframes optEnter {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: none; }
+    }
+    .opt .lab { display: grid; gap: 1px; }
+    .opt .lab-en { font-size: 0.95rem; font-weight: 500; }
+    .opt .lab-zh { font-size: 0.8rem; color: var(--muted); }
+
+    .nav-row {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border);
+    }
+    .back {
+      border: 1.5px solid var(--border); background: var(--white); color: var(--dark);
+      border-radius: 10px; padding: 10px 14px; font-family: inherit; font-size: 0.88rem;
+      font-weight: 500; cursor: pointer;
+    }
+    .back:disabled { opacity: 0.35; cursor: not-allowed; }
+    .start-btn, .primary {
+      border: 0; border-radius: 10px; padding: 13px 16px; width: 100%;
+      font-family: inherit; font-size: 0.95rem; font-weight: 700;
+      cursor: pointer; background: var(--red); color: var(--white);
+    }
+    .start-btn:hover, .primary:hover { filter: brightness(0.96); }
+    .ghost {
+      width: 100%; border: 1.5px solid var(--border); background: transparent;
+      color: var(--muted); border-radius: 10px; padding: 12px 14px;
+      font-family: inherit; font-size: 0.9rem; font-weight: 500; cursor: pointer;
+    }
+    .note { margin-top: 14px; font-size: 0.75rem; color: var(--muted); }
+
+    .result-kicker {
+      font-size: 0.75rem; font-weight: 700; letter-spacing: 0.05em;
+      text-transform: uppercase; color: var(--blue); margin: 0 0 6px;
+    }
+    .result-title { font-size: 1.25rem; font-weight: 800; color: var(--dark); letter-spacing: -0.02em; line-height: 1.25; margin: 0 0 4px; }
+    .result-title-zh { font-size: 0.95rem; color: var(--muted); margin: 0 0 12px; }
+    .tagline { font-size: 1rem; font-weight: 500; color: var(--dark); margin: 0 0 4px; }
+    .tagline-zh { font-size: 0.88rem; color: var(--muted); margin: 0 0 16px; }
+    .body-p { font-size: 0.92rem; margin: 0 0 8px; }
+    .body-zh { font-size: 0.88rem; color: var(--muted); margin: 0 0 12px; }
+
+    .bars { display: grid; gap: 8px; margin: 18px 0; }
+    .pbar { display: grid; grid-template-columns: 1fr 36px; gap: 8px; align-items: center; font-size: 0.8rem; }
+    .pbar .name { font-weight: 500; color: var(--dark); }
+    .pbar .track { grid-column: 1; height: 8px; background: var(--border); border-radius: 99px; overflow: hidden; }
+    .pbar .track > i { display: block; height: 100%; width: 0; border-radius: 99px; }
+    .pbar .pts { grid-column: 2; grid-row: 1 / span 2; font-weight: 700; color: var(--dark); text-align: right; font-variant-numeric: tabular-nums; }
+    .pbar.is-top .name { font-weight: 700; }
+
+    .signs { background: #fafafa; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px; margin: 14px 0; }
+    .signs h3 { font-size: 0.8rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); margin: 0 0 8px; }
+    .signs ul { margin: 0; padding-left: 18px; }
+    .signs li { font-size: 0.88rem; margin: 0 0 4px; }
+    .insight {
+      background: var(--blue-light); border: 1px solid var(--blue-border);
+      border-radius: var(--radius-sm); padding: 14px; margin: 14px 0;
+    }
+    .insight b { display: block; font-size: 0.8rem; letter-spacing: 0.04em; text-transform: uppercase; margin-bottom: 6px; color: var(--blue); }
+    .disclaimer-box {
+      font-size: 0.82rem; color: var(--muted); border-left: 3px solid var(--yellow);
+      padding: 8px 0 8px 12px; margin: 12px 0 16px;
+    }
+    .overlap {
+      font-size: 0.85rem; color: var(--muted); margin: 0 0 16px;
+    }
+    .actions { display: grid; gap: 8px; margin-top: 8px; }
+    .sec-block { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--border); }
+    .sec-block h3 { font-size: 0.8rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); margin: 0 0 8px; }
+
+    /* Lead fields sit on the results screen. No second popup. */
+    .lead-form {
+      display: grid;
+      gap: 10px;
+      margin-top: 18px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+    }
+    .lead-form label {
+      display: grid;
+      gap: 6px;
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: var(--dark);
+    }
+    .lead-form input {
+      width: 100%;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-family: inherit;
+      font-size: 0.95rem;
+      color: var(--dark);
+      outline: none;
+      background: #fafafa;
+    }
+    .lead-form input:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px var(--blue-light);
+      background: var(--white);
+    }
+    .lead-form input.error { border-color: var(--red); }
+    .field-error {
+      font-size: 0.75rem;
+      color: var(--red);
+      font-weight: 500;
+      min-height: 1em;
+    }
+    .lead-form .submit {
+      margin-top: 4px;
+      border: 0;
+      border-radius: 10px;
+      padding: 13px 14px;
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      background: var(--red);
+      color: var(--white);
+    }
+    .lead-form .submit:hover { filter: brightness(0.96); }
+    .lead-done {
+      margin-top: 18px;
+      padding: 16px 14px;
+      border-radius: var(--radius-sm);
+      background: var(--green-light);
+      border: 1px solid #A7D7B0;
+    }
+    .lead-done p {
+      margin: 0;
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: var(--dark);
+      line-height: 1.45;
+    }
+    .lead-done .zh { font-size: 0.88rem; color: var(--muted); font-weight: 400; margin-top: 4px; }
+
+    /* Compact chrome when the landing page loads this file in the lightbox.
+       Do NOT set overflow:hidden here: a short parent iframe + hidden overflow
+       collapses scrollHeight and clips the quiz. */
+    html.embed,
+    html.embed body {
+      background: #fff;
+    }
+    html.embed .wrap {
+      max-width: none;
+      padding: 22px 20px 24px;
+    }
+    html.embed .brand { display: none; }
+    html.embed .card {
+      border: 0;
+      box-shadow: none;
+      padding: 0;
+    }
+
+    /* The dimming of rejected options survives here: it carries meaning, not
+       motion. Everything that moves is dropped, and the JS drops its waits to
+       match, so the quiz stays instant rather than merely still. */
+    @media (prefers-reduced-motion: reduce) {
+
+      .q-body,
+      .q-body.is-in,
+      .q-body.is-in .opt,
+      .opt.is-picked,
+      .opt .radio::after,
+      .progress > i {
+        animation: none !important;
+        transition: none !important;
+      }
+
+      .q-body.is-out { opacity: 1; transform: none; }
+      .opt.is-selected .radio::after { transform: scale(1); }
+    }
+  </style>
+  <script>if (window.parent !== window) document.documentElement.className += " embed";</script>
+</head>
+<body>
+  <div class="wrap">
+    <div class="brand">
+      <img class="logo-ng"
+        src="https://assets.cdn.filesafe.space/3GYm2DXPqNM17upTDpKV/media/69d7aa3d9c84d38e9e7026f2.png"
+        alt="Nutrigene Modern Sciences">
+    </div>
+
+    <div id="intro" class="card">
+      <h1>Stress Response Profile</h1>
+      <p class="zh-line">压力反应类型</p>
+      <p class="lede">How does stress tend to show up in you?</p>
+      <p class="lede-zh">过去一段时间，压力通常怎样出现在你身上？</p>
+      <p class="lede">Think about the past two months and select the answer that best describes you.</p>
+      <p class="lede-zh">请回想过去两个月，选择最符合自己的答案。</p>
+      <button type="button" class="start-btn" id="startBtn">Start / 开始</button>
+      <p class="note">15 questions. About 3 minutes. Not a medical test.<br>15 题，大约 3 分钟。这不是医学诊断。</p>
+    </div>
+
+    <div id="quiz" class="card hidden">
+      <div class="progress"><i id="bar"></i></div>
+      <div class="q-body" id="qBody">
+        <div class="q-meta" id="qMeta">Question 1 of 15</div>
+        <p class="q-en" id="qEn"></p>
+        <p class="q-zh" id="qZh"></p>
+        <p class="q-ex hidden" id="qEx"></p>
+        <p class="q-ex-zh hidden" id="qExZh"></p>
+        <div class="opts" id="opts" role="radiogroup"></div>
+      </div>
+      <div class="nav-row">
+        <button type="button" class="back" id="backBtn" disabled>← Back</button>
+        <span class="note" id="navHint" style="margin:0">Pick one</span>
+      </div>
+    </div>
+
+    <div id="result" class="card hidden">
+      <p class="result-kicker" id="resKicker">Dominant stress response</p>
+      <h2 class="result-title" id="resTitle"></h2>
+      <p class="result-title-zh" id="resTitleZh"></p>
+      <p class="tagline" id="resTag"></p>
+      <p class="tagline-zh" id="resTagZh"></p>
+      <div id="resBody"></div>
+      <div class="bars" id="bars"></div>
+      <div id="resExtra"></div>
+      <form class="lead-form" id="leadForm" novalidate>
+        <label>
+          Full name
+          <input type="text" id="leadName" name="name" autocomplete="name" placeholder="e.g. Tan Wei Ming" required />
+          <span class="field-error" id="errName"></span>
+        </label>
+        <label>
+          Contact number
+          <input type="tel" id="leadPhone" name="phone" autocomplete="tel" inputmode="tel" placeholder="e.g. 012-345 6789" required />
+          <span class="field-error" id="errPhone"></span>
+        </label>
+        <button type="submit" class="submit">Send me my results</button>
+      </form>
+      <div class="lead-done hidden" id="leadDone">
+        <p>Got it. We will send your results on WhatsApp.</p>
+        <p class="zh">收到了。我们会通过 WhatsApp 发送你的结果。</p>
+      </div>
+      <div class="actions">
+        <button type="button" class="ghost" id="restartBtn">Do the quiz again / 再测一次</button>
+      </div>
+      <p class="note">This is a self-check, not a medical diagnosis.<br>这是自我了解，不是医学诊断。</p>
+    </div>
+  </div>
+
+  <script>
+    var SCALE = [
+      { v: 0, en: "Not at all", zh: "完全没有" },
+      { v: 1, en: "Sometimes", zh: "偶尔" },
+      { v: 2, en: "Often", zh: "经常" },
+      { v: 3, en: "Very often", zh: "非常经常" }
+    ];
+
+    var QUESTIONS = [
+      { en: "Even after something has been dealt with, I continue thinking about it.", zh: "即使事情已经处理好了，我还是会继续想着它。", profile: "overthinking" },
+      { en: "I find myself worrying about things that have not happened yet.", zh: "我会担心一些还没有发生的事情。", profile: "anxious" },
+      { en: "When I am under pressure, I become more impatient or easily irritated.", zh: "压力大的时候，我会变得比较没有耐性，也比较容易烦躁。", profile: "emotional" },
+      { en: "I can feel stress physically in my body.", zh: "我可以明显感觉到压力反映在身体上。", ex: "Examples may include tight shoulders, jaw tension, headaches, stomach discomfort or restlessness.", exZh: "例如肩颈紧绷、咬紧牙关、头痛、肠胃不适或坐立不安。", profile: "physical" },
+      { en: "After a stressful period, I feel mentally or physically drained.", zh: "经历一段压力之后，我会觉得身心都很疲累。", profile: "exhaustion" },
+      { en: "My mind stays busy even when I am trying to rest.", zh: "即使已经在休息，我的脑袋还是停不下来。", profile: "overthinking" },
+      { en: "Uncertainty makes it difficult for me to relax.", zh: "当事情不确定时，我会比较难放松下来。", profile: "anxious" },
+      { en: "Small problems affect me more strongly when I already have a lot going on.", zh: "当很多事情一起发生时，一点小事也会特别影响我。", profile: "emotional" },
+      { en: "Even when I am sitting still, my body can still feel tense or restless.", zh: "即使坐着没有做什么，我的身体还是会觉得紧绷或静不下来。", profile: "physical" },
+      { en: "When stress continues for several days, my energy noticeably drops.", zh: "当压力持续几天，我会明显感觉到自己的精神和体力下降。", profile: "exhaustion" },
+      { en: "I replay conversations, decisions or situations in my mind.", zh: "我会在脑海里反复回想一些对话、决定或发生过的事情。", profile: "overthinking" },
+      { en: "I often think about what could go wrong before something happens.", zh: "事情还没有发生之前，我会先想到可能会出什么问题。", profile: "anxious" },
+      { en: "When too many things happen at once, I can feel emotionally overwhelmed.", zh: "当很多事情同时发生时，我会觉得情绪上有点承受不住。", profile: "emotional" },
+      { en: "Stress makes it harder for my body to fully relax, especially at night.", zh: "有压力的时候，我的身体比较难真正放松，尤其是在晚上。", profile: "physical" },
+      { en: "When I have been under pressure for some time, my motivation starts to drop.", zh: "当压力持续一段时间后，我会开始觉得没有动力。", profile: "exhaustion" }
+    ];
+
+    var PROFILES = {
+      overthinking: {
+        color: "#4285F4",
+        enName: "Overthinking Stress Response",
+        zhName: "思绪型压力反应",
+        enTag: "Your mind has difficulty switching off.",
+        zhTag: "压力容易停留在你的脑海里。",
+        enBody: [
+          "You tend to process stress through thinking.",
+          "You may replay situations, analyse decisions or continue thinking about a problem long after the situation has ended."
+        ],
+        zhBody: [
+          "你比较容易通过不断思考来处理压力。",
+          "事情发生之后，你可能会继续分析、反复思考，甚至到了休息时间，脑袋还是继续运转。"
+        ],
+        signs: [
+          "Thinking about the same issue repeatedly",
+          "Replaying conversations",
+          "Difficulty mentally switching off",
+          "Thinking about work while resting",
+          "Difficulty falling asleep because the mind is still active"
+        ],
+        insightEn: "The meeting is over. You are still going over it. That night, sleep is light. Next morning you walk into another meeting already tired.",
+        insightZh: "会议已经开完了，你还在想刚才的内容。晚上睡得浅。第二天又要开会，人已经很累。"
+      },
+      anxious: {
+        color: "#E8A317",
+        enName: "Anxious Stress Response",
+        zhName: "焦虑型压力反应",
+        enTag: "Your mind tends to prepare for what might happen next.",
+        zhTag: "你的压力比较容易来自对未知的担心。",
+        enBody: [
+          "Your stress response is more future focused.",
+          "When things feel uncertain, you may automatically think ahead, anticipate possible problems or feel that you need to stay alert."
+        ],
+        zhBody: [
+          "当事情还不确定时，你会比较容易开始担心接下来会发生什么。",
+          "你可能会提前想到各种可能性，也比较难真正放松。"
+        ],
+        signs: [
+          "Worrying in advance",
+          "Feeling uncomfortable with uncertainty",
+          "Expecting something may go wrong",
+          "Feeling on alert",
+          "Difficulty relaxing until things are settled"
+        ],
+        insightEn: "Your stress often begins before the situation itself happens.",
+        insightZh: "事情还没有发生，你的压力可能已经开始了。",
+        disclaimerEn: "This result does not mean that you have an anxiety disorder. It can still be useful to notice if you worry in advance.",
+        disclaimerZh: "这并不代表你患有焦虑症。但是可以关注自己是否提前焦虑。"
+      },
+      emotional: {
+        color: "#EA4335",
+        enName: "Emotional Overload Stress Response",
+        zhName: "情绪负荷型压力反应",
+        enTag: "Stress tends to affect your emotional capacity first.",
+        zhTag: "压力累积时，情绪会比较容易受到影响。",
+        enBody: [
+          "You may normally manage situations well.",
+          "But when demands build up, your emotional capacity becomes stretched."
+        ],
+        zhBody: [
+          "平时你可能可以很好地处理事情。",
+          "但是当事情越来越多，你会发现自己的耐性下降，也更容易觉得烦躁或承受不住。"
+        ],
+        signs: [
+          "Shorter patience",
+          "Irritability",
+          "Feeling overwhelmed",
+          "Becoming more sensitive",
+          "Small problems suddenly feeling bigger"
+        ],
+        insightEn: "It may not be the small problem that changed. Your stress load may already be high.",
+        insightZh: "有时候不是事情突然变严重，而是你的压力已经累积得比较多。"
+      },
+      physical: {
+        color: "#34A853",
+        enName: "Physical Tension Stress Response",
+        zhName: "身体紧绷型压力反应",
+        enTag: "Your body shows the stress before you realise it mentally.",
+        zhTag: "压力比较容易先反映在身体上。",
+        enBody: [
+          "Stress tends to become noticeable through physical tension or difficulty relaxing.",
+          "You may not always think of yourself as stressed, but your body may be telling a different story."
+        ],
+        zhBody: [
+          "你未必觉得自己“压力很大”。",
+          "但是身体可能已经先出现反应。"
+        ],
+        signs: [
+          "Tight shoulders or neck",
+          "Jaw tension",
+          "Restlessness",
+          "Difficulty physically relaxing",
+          "Changes in sleep",
+          "Headaches or stomach discomfort during stressful periods"
+        ],
+        insightEn: "Sometimes the body notices stress before the mind labels it as stress.",
+        insightZh: "有时候你还没觉得自己有压力，身体已经先感觉到了。"
+      },
+      exhaustion: {
+        color: "#5F6368",
+        enName: "Exhaustion Stress Response",
+        zhName: "疲劳型压力反应",
+        enTag: "Prolonged stress tends to drain your energy.",
+        zhTag: "压力持续太久时，你的能量会明显下降。",
+        enBody: [
+          "Your stress response may not look anxious or emotional.",
+          "Instead, prolonged pressure gradually affects your energy, concentration and motivation."
+        ],
+        zhBody: [
+          "你的压力不一定表现成紧张或烦躁。",
+          "反而是压力持续一段时间之后，你会越来越累，精神和动力也慢慢下降。"
+        ],
+        signs: [
+          "Mental fatigue",
+          "Physical tiredness",
+          "Lower motivation",
+          "Difficulty concentrating",
+          "Needing longer to recover after busy periods"
+        ],
+        insightEn: "Your warning sign is often not feeling stressed. It is feeling depleted.",
+        insightZh: "你的压力讯号未必是“紧张”。很多时候是“没电了”。"
+      }
+    };
+
+    var ORDER = ["overthinking", "anxious", "emotional", "physical", "exhaustion"];
+    var LABEL = {
+      overthinking: "Overthinking",
+      anxious: "Anxious",
+      emotional: "Emotional overload",
+      physical: "Physical tension",
+      exhaustion: "Exhaustion"
+    };
+
+    var qi = 0;
+    var answers = [];
+    var advancing = false;
+    var lastResult = null;
+
+    var el = {
+      intro: document.getElementById("intro"),
+      quiz: document.getElementById("quiz"),
+      result: document.getElementById("result"),
+      bar: document.getElementById("bar"),
+      qMeta: document.getElementById("qMeta"),
+      qEn: document.getElementById("qEn"),
+      qZh: document.getElementById("qZh"),
+      qEx: document.getElementById("qEx"),
+      qExZh: document.getElementById("qExZh"),
+      opts: document.getElementById("opts"),
+      qBody: document.getElementById("qBody"),
+      back: document.getElementById("backBtn")
+    };
+
+    var REDUCE = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var HOLD_MS = REDUCE ? 0 : 240;   // time the chosen answer sits on screen alone
+    var OUT_MS = REDUCE ? 0 : 170;    // must match the .q-body transition
+
+    /* Restarting a CSS animation needs the class off, a forced reflow to flush
+       that removal, then the class on again. Without the reflow the browser
+       coalesces both writes into one frame, sees no net change, and the second
+       question onward arrives with no animation at all. */
+    function playEnter() {
+      if (REDUCE) return;
+      el.qBody.classList.remove("is-in");
+      void el.qBody.offsetWidth;
+      el.qBody.classList.add("is-in");
+    }
+
+    document.getElementById("startBtn").addEventListener("click", function () {
+      el.intro.classList.add("hidden");
+      el.quiz.classList.remove("hidden");
+      renderQ();
+      playEnter();
+    });
+
+    function renderQ() {
+      advancing = false;
+      var q = QUESTIONS[qi];
+      el.qMeta.textContent = "Question " + (qi + 1) + " of " + QUESTIONS.length + "  ·  第 " + (qi + 1) + " / " + QUESTIONS.length + " 题";
+      el.bar.style.width = (qi / QUESTIONS.length * 100) + "%";
+      el.qEn.textContent = q.en;
+      el.qZh.textContent = q.zh;
+      if (q.ex) {
+        el.qEx.textContent = q.ex;
+        el.qExZh.textContent = q.exZh;
+        el.qEx.classList.remove("hidden");
+        el.qExZh.classList.remove("hidden");
+      } else {
+        el.qEx.classList.add("hidden");
+        el.qExZh.classList.add("hidden");
+      }
+      el.back.disabled = qi === 0;
+      el.opts.innerHTML = "";
+      el.opts.classList.remove("is-locked");
+      el.qBody.classList.remove("is-out");
+
+      SCALE.forEach(function (opt, i) {
+        var b = document.createElement("button");
+        b.type = "button";
+        b.className = "opt";
+        b.style.setProperty("--i", i);   // drives the stagger delay
+        b.setAttribute("role", "radio");
+        b.innerHTML =
+          '<span class="radio" aria-hidden="true"></span>' +
+          '<span class="lab"><span class="lab-en"></span><span class="lab-zh"></span></span>';
+        b.querySelector(".lab-en").textContent = opt.en;
+        b.querySelector(".lab-zh").textContent = opt.zh;
+        if (answers[qi] === opt.v) b.classList.add("is-selected");
+
+        b.addEventListener("click", function () {
+          if (advancing) return;
+          advancing = true;
+          Array.prototype.forEach.call(el.opts.querySelectorAll(".opt"), function (node) {
+            node.classList.remove("is-selected");
+            node.disabled = true;
+          });
+          el.opts.classList.add("is-locked");
+          b.classList.add("is-selected", "is-picked");
+
+          /* Recorded now, not after the wait. The answer must not depend on an
+             animation finishing, or a backgrounded tab could drop it. */
+          answers[qi] = opt.v;
+          el.bar.style.width = ((qi + 1) / QUESTIONS.length * 100) + "%";
+
+          setTimeout(function () {
+            /* is-in must come off first. It is a filled animation (both), and a
+               filled animation beats a transition in the cascade, so adding
+               is-out while it is still on changes nothing: the question would
+               hard-cut instead of leaving. */
+            el.qBody.classList.remove("is-in");
+            void el.qBody.offsetWidth;
+            el.qBody.classList.add("is-out");
+            setTimeout(function () {
+              qi += 1;
+              if (qi >= QUESTIONS.length) showResult();
+              else { renderQ(); playEnter(); }
+            }, OUT_MS);
+          }, HOLD_MS);
+        });
+        el.opts.appendChild(b);
+      });
+    }
+
+    el.back.addEventListener("click", function () {
+      if (qi === 0) return;
+      advancing = false;
+      qi -= 1;
+      renderQ();
+      playEnter();
+    });
+
+    function scoreProfiles() {
+      var s = { overthinking: 0, anxious: 0, emotional: 0, physical: 0, exhaustion: 0 };
+      QUESTIONS.forEach(function (q, i) {
+        s[q.profile] += answers[i] || 0;
+      });
+      return s;
+    }
+
+    function ranked(s) {
+      return ORDER.map(function (k) {
+        return { k: k, v: s[k] };
+      }).sort(function (a, b) {
+        if (b.v !== a.v) return b.v - a.v;
+        return ORDER.indexOf(a.k) - ORDER.indexOf(b.k);
+      });
+    }
+
+    function profileHtml(key, headingEn, headingZh) {
+      var p = PROFILES[key];
+      var h = "";
+      if (headingEn) {
+        h += '<div class="sec-block"><h3>' + headingEn + (headingZh ? " / " + headingZh : "") + "</h3>";
+      }
+      p.enBody.forEach(function (line) { h += '<p class="body-p">' + line + "</p>"; });
+      p.zhBody.forEach(function (line) { h += '<p class="body-zh">' + line + "</p>"; });
+      h += '<div class="signs"><h3>Common signs / 常见表现</h3><ul>';
+      p.signs.forEach(function (s) { h += "<li>" + s + "</li>"; });
+      h += "</ul></div>";
+      h += '<div class="insight"><b>Key insight</b><p class="body-p">' + p.insightEn + "</p>";
+      h += '<p class="body-zh">' + p.insightZh + "</p>";
+      if (p.insightNote) h += '<p class="body-zh">' + p.insightNote + "</p>";
+      h += "</div>";
+      if (p.disclaimerEn) {
+        h += '<div class="disclaimer-box">' + p.disclaimerEn + "<br>" + p.disclaimerZh + "</div>";
+      }
+      if (headingEn) h += "</div>";
+      return h;
+    }
+
+    function showResult() {
+      el.quiz.classList.add("hidden");
+      el.result.classList.remove("hidden");
+      el.bar.style.width = "100%";
+
+      var s = scoreProfiles();
+      var r = ranked(s);
+      var primary = r[0];
+      var secondary = r[1];
+      var close = secondary.v > 0 && (primary.v - secondary.v) <= 1;
+      lastResult = { scores: s, primary: primary.k, secondary: close ? secondary.k : null };
+
+      var p = PROFILES[primary.k];
+      document.getElementById("resKicker").textContent = close
+        ? "Primary stress response / 主要压力反应"
+        : "Dominant stress response / 主要压力反应";
+      document.getElementById("resTitle").textContent = p.enName;
+      document.getElementById("resTitleZh").textContent = p.zhName;
+      document.getElementById("resTag").textContent = p.enTag;
+      document.getElementById("resTagZh").textContent = p.zhTag;
+
+      var extra = "";
+      if (close) {
+        extra += '<p class="overlap">It is common that stress responses overlap. Worry and rumination, for example, are related but not the same.<br>压力反应常常会重叠。例如担心和反复回想是相关的，但并不完全一样。</p>';
+      }
+      extra += profileHtml(primary.k);
+
+      if (close) {
+        var sP = PROFILES[secondary.k];
+        extra += '<div class="sec-block">';
+        extra += "<h3>Secondary stress response / 次要压力反应</h3>";
+        extra += '<p class="tagline">' + sP.enName + "</p>";
+        extra += '<p class="tagline-zh">' + sP.zhName + " · " + sP.zhTag + "</p>";
+        extra += profileHtml(secondary.k);
+        extra += "</div>";
+      }
+
+      document.getElementById("resBody").innerHTML = extra;
+
+      var bars = document.getElementById("bars");
+      bars.innerHTML = "";
+      ORDER.forEach(function (k) {
+        var row = document.createElement("div");
+        row.className = "pbar" + (k === primary.k || (close && k === secondary.k) ? " is-top" : "");
+        var pct = (s[k] / 9) * 100;
+        row.innerHTML =
+          '<span class="name">' + LABEL[k] + "</span>" +
+          '<span class="pts">' + s[k] + "/9</span>" +
+          '<div class="track"><i style="width:' + pct + "%;background:" + PROFILES[k].color + '"></i></div>';
+        bars.appendChild(row);
+      });
+    }
+
+    document.getElementById("restartBtn").addEventListener("click", function () {
+      qi = 0;
+      answers = [];
+      advancing = false;
+      lastResult = null;
+      document.getElementById("leadForm").reset();
+      document.getElementById("leadForm").classList.remove("hidden");
+      document.getElementById("leadDone").classList.add("hidden");
+      document.getElementById("errName").textContent = "";
+      document.getElementById("errPhone").textContent = "";
+      document.getElementById("leadName").classList.remove("error");
+      document.getElementById("leadPhone").classList.remove("error");
+      el.result.classList.add("hidden");
+      el.intro.classList.remove("hidden");
+    });
+
+    document.getElementById("leadForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+      var name = document.getElementById("leadName").value.trim();
+      var phone = document.getElementById("leadPhone").value.trim();
+      var digits = phone.replace(/\D/g, "");
+      var ok = true;
+      document.getElementById("errName").textContent = "";
+      document.getElementById("errPhone").textContent = "";
+      document.getElementById("leadName").classList.remove("error");
+      document.getElementById("leadPhone").classList.remove("error");
+      if (!name) {
+        document.getElementById("errName").textContent = "Please enter your name.";
+        document.getElementById("leadName").classList.add("error");
+        ok = false;
+      }
+      if (digits.length < 9 || digits.length > 15) {
+        document.getElementById("errPhone").textContent = "Please enter a valid contact number.";
+        document.getElementById("leadPhone").classList.add("error");
+        ok = false;
+      }
+      if (!ok) return;
+
+      var payload = {
+        name: name,
+        phone: phone,
+        quiz: "stress-response-profile",
+        result: lastResult,
+        ts: new Date().toISOString()
+      };
+      try {
+        localStorage.setItem("ng_stress_quiz_lead", JSON.stringify(payload));
+      } catch (err) {}
+
+      /* Stay on this page. Parent lightbox closes the session.
+         WhatsApp welcome is wired next session. */
+      document.getElementById("leadForm").classList.add("hidden");
+      document.getElementById("leadDone").classList.remove("hidden");
+      if (window.parent && window.parent !== window) {
+        window.parent.postMessage({ type: "ng-stress-quiz-done", lead: payload }, "*");
+      }
+    });
+  </script>
+</body>
+</html>
