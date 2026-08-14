@@ -274,21 +274,6 @@
       color: var(--white);
     }
     .lead-form .submit:hover { filter: brightness(0.96); }
-    .lead-done {
-      margin-top: 18px;
-      padding: 16px 14px;
-      border-radius: var(--radius-sm);
-      background: var(--green-light);
-      border: 1px solid #A7D7B0;
-    }
-    .lead-done p {
-      margin: 0;
-      font-size: 0.95rem;
-      font-weight: 500;
-      color: var(--dark);
-      line-height: 1.45;
-    }
-    .lead-done .zh { font-size: 0.88rem; color: var(--muted); font-weight: 400; margin-top: 4px; }
 
     /* Compact chrome when the landing page loads this file in the lightbox.
        Do NOT set overflow:hidden here: a short parent iframe + hidden overflow
@@ -386,10 +371,6 @@
         </label>
         <button type="submit" class="submit" id="leadSubmit">Continue</button>
       </form>
-      <div class="lead-done hidden" id="leadDone">
-        <p>Got it. We will send your results on WhatsApp.</p>
-        <p class="zh">收到了。我们会通过 WhatsApp 发送你的结果。</p>
-      </div>
       <div class="actions">
         <button type="button" class="ghost" id="restartBtn">Do the quiz again / 再测一次</button>
       </div>
@@ -775,7 +756,6 @@
       lastResult = null;
       document.getElementById("leadForm").reset();
       document.getElementById("leadForm").classList.remove("hidden");
-      document.getElementById("leadDone").classList.add("hidden");
       document.getElementById("errName").textContent = "";
       document.getElementById("errPhone").textContent = "";
       document.getElementById("leadName").classList.remove("error");
@@ -817,10 +797,7 @@
         localStorage.setItem("ng_stress_quiz_lead", JSON.stringify(payload));
       } catch (err) {}
 
-      /* Stay on this page. Parent lightbox closes the session.
-         WhatsApp welcome is wired next session. */
-      document.getElementById("leadForm").classList.add("hidden");
-      document.getElementById("leadDone").classList.remove("hidden");
+      /* Parent landing page closes the lightbox and the journey continues. */
       if (window.parent && window.parent !== window) {
         window.parent.postMessage({ type: "ng-stress-quiz-done", lead: payload }, "*");
       }
