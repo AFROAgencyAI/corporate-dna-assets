@@ -542,6 +542,11 @@
     var qi = 0;
     var answers = [];
     var advancing = false;
+    /* Lead sink. The quiz is served from github.io and posts cross-origin, so
+       this origin has to be in the API's SITE_ORIGIN allowlist or the browser
+       throws the response away before this file ever sees it. */
+    var QUIZ_ENDPOINT = "https://mka-checkout.vercel.app/api/quiz";
+
     var lastResult = null;
 
     var el = {
@@ -797,9 +802,37 @@
         localStorage.setItem("ng_stress_quiz_lead", JSON.stringify(payload));
       } catch (err) {}
 
-      /* Parent landing page closes the lightbox and the journey continues. */
-      if (window.parent && window.parent !== window) {
-        window.parent.postMessage({ type: "ng-stress-quiz-done", lead: payload }, "*");
+      var submitBtn = this.querySelector("button[type=submit], .lead-go");
+      if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = "Saving\u2026"; }
+
+      /* Closing is one-way: the parent points this iframe at about:blank 220ms
+         later, which aborts anything still in flight. keepalive lets the POST
+         outlive that teardown, so the lead lands even if the reader is already
+         back on the page. Called at most once. */
+      var closed = false;
+      function doneClose() {
+        if (closed) return;
+        closed = true;
+        if (window.parent && window.parent !== window) {
+          window.parent.postMessage({ type: "ng-stress-quiz-done", lead: payload }, "*");
+        }
+      }
+
+      if (typeof QUIZ_ENDPOINT === "string" && QUIZ_ENDPOINT) {
+        /* Nobody at an event should watch a spinner on venue wifi: close on the
+           response OR after 2.5s, whichever comes first. */
+        setTimeout(doneClose, 2500);
+        fetch(QUIZ_ENDPOINT, {
+          method: "POST",
+          keepalive: true,
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        })
+          .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); })
+          .catch(function (err) { console.error("quiz lead save failed", err); })
+          .then(doneClose);
+      } else {
+        doneClose();
       }
     });
   </script>
