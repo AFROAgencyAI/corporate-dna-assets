@@ -53,4 +53,15 @@ https://cdn.jsdelivr.net/gh/AFROAgencyAI/corporate-dna-assets@main/816/{path}
 Review videos themselves stay on the GHL filesafe CDN. Posters live here so the
 video elements can run `preload="none"` and download nothing until tapped.
 
-Activity posters for this page come from `llm-activities/{folder}/cover.webp`.
+| `activities/p01.webp` .. `activities/p23.webp` | Activity posters, portrait derivatives |
+
+### Activity posters
+
+`llm-activities/{folder}/cover.webp` is a 1920x1280 landscape sheet: the poster
+sits on a white canvas, and P05 / P06 are 2-up sheets carrying two design variants
+side by side. Cropping those to portrait in CSS slices the titles mid-word.
+
+`816/activities/pNN.webp` are portrait derivatives, 480x679 (A4 ratio), cropped
+per-file to the measured content box, with P05 / P06 cropped to the right-hand
+variant only. 1.3 MB for the set, down from 3.3 MB. Use these on the 816 page.
+Numbering matches P01-P23 in the LLM Activity Inventory Master.
